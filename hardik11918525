@@ -1,0 +1,184 @@
+#include<bits/stdc++.h>
+using namespace std;
+
+class user{
+	private:
+	int uid;
+	string email;
+	string username;
+	string password;
+	public:
+	static int x;
+	user(string email,string username,string password)
+	{
+		this->email=email;
+		this->username=username;
+		this->password=password;
+	}
+	int getID()
+	{
+		return uid;
+	}
+	string getEmail()
+	{
+		return email;
+	}
+	string getUsername()
+	{
+		return username;
+	}
+	string getPassword()
+	{
+		return password;
+	}
+};
+int user::x=1;
+
+//------------------------------------------------------------------------------------------------
+class TrieNode{
+	public:
+		TrieNode* children[256];
+		bool isEnd;
+		TrieNode()
+		{
+			isEnd=false;
+			for(int i=0;i<=256;i++)
+			{
+				children[i]=NULL;
+			}
+		}
+};
+
+class Trie{
+	public:
+	TrieNode* root;
+	Trie()
+	{
+		root=new TrieNode();
+	}
+	void insert(TrieNode *crawler,string s)
+	{	
+		for(int i=0;i<s.size();i++)
+		{
+			if(crawler->children[(int)s[i]])
+			{
+				crawler=crawler->children[(int)s[i]];
+			}
+			else
+			{
+				TrieNode* newNode=new TrieNode();
+				crawler->children[(int)s[i]]=newNode;
+				crawler=crawler->children[(int)s[i]];
+			}
+		}
+		crawler->isEnd=true;
+	}
+
+	bool search(TrieNode* crawler,string s,int curr)
+	{
+		if(curr==s.size())
+		{
+			if(crawler->isEnd==true)
+			{
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
+	
+		if(crawler->children[(int)s[curr]]==NULL)
+		{
+			return false;
+		}
+		return search(crawler->children[(int)s[curr]],s,curr+1);
+	}
+};
+class xyz{
+	public:
+		Trie usernames;
+		map<string,user*> user_details;
+		data()
+		{
+			usernames=Trie();
+		}
+		bool find(string s)
+		{
+			return usernames.search(usernames.root,s,0);
+		}
+		void addNewUser(user x)
+		{
+			usernames.insert(usernames.root,x.getUsername());
+			user_details[x.getUsername()]=new user(x.getEmail(),x.getUsername(),x.getPassword());
+		}
+		bool checkPassword(string username,string password)
+		{
+			return user_details[username]->getPassword()==password;
+		}
+};
+int main()
+{
+	cout<<"Please Enter Your Request"<<endl;
+	
+	xyz obj;
+	
+	char ch='y';
+	while(ch!='n')
+	{
+		cout<<endl<<endl;
+		cout<<"Press 1:- To create new user"<<endl;
+		cout<<"Press 2:- Login"<<endl;
+		int x;
+		cin>>x;
+		switch(x)
+		{
+			case 1:
+				{
+					string email,username,password;
+			 		cout<<"	Enter Email:- "<<endl;
+			 		cin>>email;
+			 		cout<<"	Enter Username:- "<<endl;
+			 		cin>>username;
+			 		while(obj.find(username))
+			   		{
+			   			cout<<"Username Already Taken , Please enter a new username !!"<<endl;
+			   			cin>>username;
+			   		}
+			 		cout<<"	Enter Password:- "<<endl;
+			   		cin>>password;
+			   
+			   		user u(email,username,password);
+			   		obj.addNewUser(u);
+			   	
+			   		break;
+			   	}
+			   	
+			case 2:
+				{
+				string uname,pword;
+				cout<<"Username:- ";
+				cin>>uname;
+				while(!obj.find(uname))
+			   	{
+			   		cout<<"Please enter a valid username !!"<<endl;
+			   		cin>>uname;
+			   	}
+			   	cout<<"Password:- ";
+			   	cin>>pword;
+			   	while(!obj.checkPassword(uname,pword))
+			   	{
+			   		cout<<"Please enter a valid password !!"<<endl;
+			   		cin>>pword;
+				}
+				cout<<endl<<endl<<"Login Successful HURREY"<<endl;
+			   	break;
+			   }
+			
+			default: cout<<"Enter valid input"<<endl;
+				break;
+		}
+		cout<<endl<<"Want to continue Press y"<<endl;
+		cin>>ch;
+	}
+}
